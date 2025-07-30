@@ -1,0 +1,35 @@
+import pandas as ps
+
+#Загрузка базы парфюмов их csv файла
+def base_load():
+    return ps.read_csv("perfume_base.csv")
+
+#Функция поиска по нотам
+def search_via_notes(df,notes):
+    notes = [n.strip().lower() for n in notes.split(",")]
+    result = []
+    for _, row in df.iterrows():
+        perfume_notes = [n.strip().lower() for n in row["notes"].split(",")]
+        if all(note in perfume_notes for note in notes):
+            result.append(row)
+    return ps.DataFrame(result)
+
+#
+def main():
+    df = base_load()
+    print("Доступные ноты: ликёр, виски, бергамот, ноты тонка \n")
+
+    while True:
+        user_input = input("Введите ноты через запятую или напишите 'stop': ")
+        if user_input == "stop":
+            break
+
+        result = search_via_notes(df, user_input)
+        if not result.empty:
+            print("\nНайдены парфюмы:")
+            print(result[["name", "brand", "notes"]])
+        else:
+            print("Ничего не найдено :(")
+
+if __name__ == "__main__":
+    main()
