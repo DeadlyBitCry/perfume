@@ -13,23 +13,53 @@ def search_via_notes(df,notes):
         if all(note in perfume_notes for note in notes):
             result.append(row)
     return ps.DataFrame(result)
+#Функция поиска по бренду
 
-#
+def search_via_brand(df,brands):
+    brand_to_find = [b.strip().lower() for n in brands.split (",")]
+    result = []
+    for _,row in df.iterrows():
+        perfume_brand = [b.strip().lower() for n in row ["brand"].split(",")]
+        if all(b in perfume_brand for b in brand_to_find):
+            result.append(row)
+    return ps.DataFrame(result)
+#Функция поиска по полу
+
+def search_via_gender(df, genders):
+    genders_to_find = [g.strip().lower() for g in genders.split(",")]
+    return df[df["gender"].apply(lambda x: all(g in [item.strip().lower() for item in x.split(",")] for g in genders_to_find))]
+#Функция поиска по сезону
+
+def search_via_season(df,season):
+    season_to_find = [s.strip().lower() for s in season.split(",")]
+    result = []
+    for _, row in df.iterrows():
+        perfume_season = [s.strip().lower() for s in row["season"].split(",")]
+        if all(s in perfume_season for s in season_to_find):
+            result.append(row)
+    return ps.DataFrame(result)
+
+Search_dictionary = {
+    "ноты": search_via_notes,
+    "бренд": search_via_brand,
+    "гендер": search_via_gender,
+    "сезон": search_via_season
+}
+
 def main():
     df = base_load()
-    print("Доступные ноты: ликёр, виски, бергамот, ноты тонка \n")
-
-    while True:
-        user_input = input("Введите ноты через запятую или напишите 'stop': ")
-        if user_input == "stop":
-            break
-
-        result = search_via_notes(df, user_input)
-        if not result.empty:
-            print("\nНайдены парфюмы:")
-            print(result[["name", "brand", "notes"]])
-        else:
-            print("Ничего не найдено :(")
+    print("Доступен поиск по: нотам, бренду, гендеру, сезону \n")
+    aspect = input("Введите аспект поиска: ")
+    if aspect not in Search_dictionary:
+        print("Такого аспекта нет")
+        return
+    search = input (f"Что вы ищете по {aspect}: ")
+    result = Search_dictionary[aspect](df,search)
+    if not result.empty:
+        print("\nРезультаты:")
+        print(result[["name", "brand", "notes"]])
+    else:
+        print("Ничего не найдено")
 
 if __name__ == "__main__":
     main()
