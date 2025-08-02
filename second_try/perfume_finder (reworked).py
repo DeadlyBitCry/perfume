@@ -8,19 +8,20 @@ def base_load():
 
 # Функция поиска по нотам.  Function of searching by notes
 def search_via_notes(df, notes):
-    notes = [n.strip().lower() for n in notes.split(",")]
-    result = []
-    for _, row in df.iterrows():
-        perfume_notes = [n.strip().lower() for n in row["notes"].split(",")]
-        if all(note in perfume_notes for note in notes):
-            result.append(row)
-    return pd.DataFrame(result)
+    notes_to_find = [n.strip().lower() for n in notes.split(",")]
+    return df[df["notes"].apply
+              (lambda x: all
+               (n in [item.strip().lower() for item in x.split(",")] for
+                n in notes_to_find))]
 
 
 # Функция поиска по бренду.  Function of searching by brand
 def search_via_brand(df, brands):
     brands_to_find = [b.strip().lower() for b in brands.split(",")]
-    return df[df["brand"].str.lower().isin(brands_to_find)]
+    return df[df["brand"].apply
+              (lambda x: all
+               (b in [item.strip().lower() for item in x.split(",")] for
+                b in brands_to_find))]
 
 
 # Функция поиска по полу.  Function of searching by gender
